@@ -36,7 +36,7 @@ func TestFrameEvent_DataString(t *testing.T) {
                 id:     tt.fields.id,
                 kind:   tt.fields.kind,
                 time:   tt.fields.time,
-                data:   tt.fields.data,
+                frame:  tt.fields.data,
                 header: tt.fields.header,
             }
             if got := f.DataString(); got != tt.want {

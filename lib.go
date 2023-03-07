@@ -11,7 +11,7 @@ type Kind uint16
 type Header map[string]any
 
 // Event 具体Event消息接口
-type Event[T any] interface {
+type Event interface {
     // ID 返回事件ID
     ID() int64
     // Timestamp 返回事件发生时间
@@ -21,30 +21,30 @@ type Event[T any] interface {
     // Header 返回事件头
     Header() Header
     // Data 返回事件数据
-    Data() T
+    Data() any
 }
 
-type EventSink[T any] func(ctx context.Context, event Event[T]) error
+type EventSink func(ctx context.Context, event Event) error
 
 // Input 事件输入源
-type Input[T any] interface {
-    OnRead(ctx context.Context, sink EventSink[T]) error
+type Input interface {
+    OnRead(ctx context.Context, sink EventSink) error
 }
 
 // Output 事件输出源
-type Output[T any] interface {
-    OnWrite(ctx context.Context, events []Event[T]) error
+type Output interface {
+    OnWrite(ctx context.Context, events []Event) error
 }
 
 // FilterFunc 执行过滤原始Event的函数；
-type FilterFunc[T any] func(ctx context.Context, event Event[T]) error
+type FilterFunc func(ctx context.Context, event Event) error
 
 // EventFilter 原始Event过滤接口
-type EventFilter[T any] interface {
-    OnFilter(next FilterFunc[T]) FilterFunc[T]
+type EventFilter interface {
+    OnFilter(next FilterFunc) FilterFunc
 }
 
 // EventTransformer 处理Event格式转换
-type EventTransformer[F any, T any] interface {
-    OnTransform(ctx context.Context, in []Event[F]) (out []Event[T], err error)
+type EventTransformer interface {
+    OnTransform(ctx context.Context, in []Event) (out []Event, err error)
 }

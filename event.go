@@ -4,13 +4,13 @@ import "time"
 
 type ByteFrame []byte
 
-var _ Event[ByteFrame] = new(FrameEvent)
+var _ Event = new(FrameEvent)
 
 type FrameEvent struct {
     id     int64
     kind   Kind
     time   time.Time
-    data   []byte
+    frame  []byte
     header Header
 }
 
@@ -30,12 +30,16 @@ func (f *FrameEvent) Header() Header {
     return f.header
 }
 
-func (f *FrameEvent) Data() ByteFrame {
-    return f.data
+func (f *FrameEvent) Data() any {
+    return f.frame
 }
 
 func (f *FrameEvent) DataString() string {
-    return string(f.data)
+    return string(f.frame)
+}
+
+func (f *FrameEvent) DataBytes() []byte {
+    return f.frame
 }
 
 func NewFrameEvent(id int64, kind Kind, time time.Time, header Header, data []byte) *FrameEvent {
@@ -44,7 +48,7 @@ func NewFrameEvent(id int64, kind Kind, time time.Time, header Header, data []by
         kind:   kind,
         time:   time,
         header: header,
-        data:   ByteFrame(data),
+        frame:  ByteFrame(data),
     }
 }
 
@@ -53,7 +57,7 @@ func NewSimpleFrameEvent(id int64, kind Kind, data []byte) *FrameEvent {
         id:     id,
         kind:   kind,
         time:   time.Now(),
-        data:   ByteFrame(data),
+        frame:  ByteFrame(data),
         header: Header{},
     }
 }

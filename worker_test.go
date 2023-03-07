@@ -7,7 +7,7 @@ import (
 
 type input struct{}
 
-func (i *input) OnRead(ctx context.Context, sink EventSink[ByteFrame]) error {
+func (i *input) OnRead(ctx context.Context, sink EventSink) error {
     for i := 0; i < 10; i++ {
         err := sink(ctx, NewSimpleFrameEvent(int64(i), 0, []byte("hello")))
         if err != nil {
@@ -19,9 +19,9 @@ func (i *input) OnRead(ctx context.Context, sink EventSink[ByteFrame]) error {
 
 type output struct{}
 
-func (o *output) OnWrite(ctx context.Context, events []Event[ByteFrame]) error {
+func (o *output) OnWrite(ctx context.Context, events []Event) error {
     for _, event := range events {
-        println(string(event.Data()))
+        println(event.Data())
     }
     return nil
 }
@@ -29,8 +29,8 @@ func (o *output) OnWrite(ctx context.Context, events []Event[ByteFrame]) error {
 type filter struct {
 }
 
-func (f *filter) OnFilter(next FilterFunc[ByteFrame]) FilterFunc[ByteFrame] {
-    return func(ctx context.Context, event Event[ByteFrame]) error {
+func (f *filter) OnFilter(next FilterFunc) FilterFunc {
+    return func(ctx context.Context, event Event) error {
         if event.ID()%2 == 0 {
             return nil
         }
@@ -39,7 +39,7 @@ func (f *filter) OnFilter(next FilterFunc[ByteFrame]) FilterFunc[ByteFrame] {
 }
 
 func TestWorker_Run(t *testing.T) {
-    worker := Worker[ByteFrame]{
+    worker := Worker{
         name: "test",
     }
     worker.SetInput(&input{})
