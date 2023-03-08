@@ -1,6 +1,9 @@
 package next
 
-import "context"
+import (
+    "context"
+    "fmt"
+)
 
 type Worker struct {
     name         string
@@ -43,7 +46,7 @@ func (w *Worker) Run(ctx context.Context) error {
         events := []Event{event}
         for _, tf := range w.transformers {
             if events, err = tf.OnTransform(context, events); err != nil {
-                return err
+                return fmt.Errorf("transformer %T error: %w", tf, err)
             }
         }
         return w.output.OnWrite(context, events)
